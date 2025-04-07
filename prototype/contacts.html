@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OA System - 通讯录</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <style>
+        .page-header {
+            padding: 16px 20px;
+            background-color: var(--background-white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .header-actions {
+            display: flex;
+        }
+        
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+        
+        .search-container {
+            padding: 12px 16px;
+            background: var(--background-white);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .search-bar {
+            background-color: var(--background-light);
+            border-radius: 8px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar i {
+            color: var(--text-tertiary);
+            margin-right: 8px;
+        }
+        
+        .search-input {
+            background: transparent;
+            border: none;
+            font-size: 15px;
+            width: 100%;
+            color: var(--text-primary);
+        }
+        
+        .search-input:focus {
+            outline: none;
+        }
+        
+        .contacts-tabs {
+            display: flex;
+            background-color: var(--background-white);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .contacts-tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            position: relative;
+        }
+        
+        .contacts-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .contacts-tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .org-structure {
+            padding: 16px;
+        }
+        
+        .org-card {
+            background-color: var(--background-white);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .org-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .org-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: rgba(74, 111, 227, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+        .org-icon i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+        
+        .org-info {
+            flex: 1;
+        }
+        
+        .org-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .org-members {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .org-members span {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .org-arrow {
+            color: var(--text-tertiary);
+        }
+        
+        .contact-list {
+            padding: 0;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .contact-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 12px;
+        }
+        
+        .contact-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .contact-info {
+            flex: 1;
+        }
+        
+        .contact-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .contact-position {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .contact-actions {
+            display: flex;
+        }
+        
+        .contact-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            color: var(--text-tertiary);
+        }
+        
+        .contact-action.call {
+            color: var(--success-color);
+        }
+        
+        .indexed-contacts {
+            padding: 0;
+        }
+        
+        .index-letter {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background-color: var(--background-light);
+            position: sticky;
+            top: 110px;
+            z-index: 5;
+        }
+        
+        .index-sidebar {
+            position: fixed;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+        
+        .index-item {
+            padding: 2px 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .index-item.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .starred-section {
+            padding: 8px 16px;
+            background-color: var(--background-light);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .position-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: rgba(74, 111, 227, 0.1);
+            color: var(--primary-color);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-bar-left">9:41</div>
+            <div class="status-bar-right">
+                <span>5G</span>
+                <span style="margin-left: 5px;"><i class="ri-wifi-fill"></i></span>
+                <span style="margin-left: 5px;"><i class="ri-battery-fill battery-icon"></i></span>
+            </div>
+        </div>
+        
+        <!-- App Content -->
+        <div class="app-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">通讯录</h1>
+                <div class="header-actions">
+                    <div class="header-action-btn">
+                        <i class="ri-add-line"></i>
+                    </div>
+                    <div class="header-action-btn">
+                        <i class="ri-more-2-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search Container -->
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="ri-search-line"></i>
+                    <input type="text" class="search-input" placeholder="搜索联系人">
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="contacts-tabs">
+                <div class="contacts-tab active" id="tab-contacts">联系人</div>
+                <div class="contacts-tab" id="tab-org">组织架构</div>
+            </div>
+            
+            <!-- Contacts Tab Content -->
+            <div class="contacts-content" id="contacts-content">
+                <!-- Starred Contacts -->
+                <div class="starred-section">
+                    星标联系人
+                </div>
+                
+                <div class="contact-list">
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1551292831-023188e78222?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="张总">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">张伟 <span class="position-badge">总经理</span></div>
+                            <div class="contact-position">总裁办</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="李总">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">李娜 <span class="position-badge">副总裁</span></div>
+                            <div class="contact-position">人力资源部</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Indexed Contacts -->
+                <div class="indexed-contacts">
+                    <div class="index-letter">A</div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="安妮">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">安妮</div>
+                            <div class="contact-position">市场部 - 市场专员</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="index-letter">C</div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1577880216142-8549e9c92eb7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="陈明">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">陈明</div>
+                            <div class="contact-position">研发部 - 产品经理</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="陈丽">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">陈丽</div>
+                            <div class="contact-position">财务部 - 会计</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="index-letter">L</div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="李明">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">李明</div>
+                            <div class="contact-position">研发部 - 产品设计师</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="刘强">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">刘强</div>
+                            <div class="contact-position">销售部 - 区域经理</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="index-letter">W</div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="王芳">
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-name">王芳</div>
+                            <div class="contact-position">市场部 - 经理</div>
+                        </div>
+                        <div class="contact-actions">
+                            <div class="contact-action call">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <div class="contact-action">
+                                <i class="ri-message-2-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Index Sidebar -->
+                <div class="index-sidebar">
+                    <div class="index-item active">A</div>
+                    <div class="index-item">B</div>
+                    <div class="index-item">C</div>
+                    <div class="index-item">D</div>
+                    <div class="index-item">F</div>
+                    <div class="index-item">G</div>
+                    <div class="index-item">H</div>
+                    <div class="index-item">J</div>
+                    <div class="index-item">L</div>
+                    <div class="index-item">M</div>
+                    <div class="index-item">W</div>
+                    <div class="index-item">X</div>
+                    <div class="index-item">Y</div>
+                    <div class="index-item">Z</div>
+                    <div class="index-item">#</div>
+                </div>
+            </div>
+            
+            <!-- Org Structure Tab Content (Initially Hidden) -->
+            <div class="org-structure" id="org-structure" style="display:none;">
+                <div class="org-card">
+                    <div class="org-header">
+                        <div class="org-icon">
+                            <i class="ri-government-line"></i>
+                        </div>
+                        <div class="org-info">
+                            <div class="org-name">总裁办</div>
+                            <div class="org-members">成员 <span>5</span> 人</div>
+                        </div>
+                        <div class="org-arrow">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-list">
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <img src="https://images.unsplash.com/photo-1551292831-023188e78222?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="张总">
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">张伟</div>
+                                <div class="contact-position">总经理</div>
+                            </div>
+                            <div class="contact-actions">
+                                <div class="contact-action call">
+                                    <i class="ri-phone-line"></i>
+                                </div>
+                                <div class="contact-action">
+                                    <i class="ri-message-2-line"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-header">
+                        <div class="org-icon" style="background-color: rgba(54, 179, 126, 0.1); color: var(--success-color);">
+                            <i class="ri-team-line"></i>
+                        </div>
+                        <div class="org-info">
+                            <div class="org-name">人力资源部</div>
+                            <div class="org-members">成员 <span>12</span> 人</div>
+                        </div>
+                        <div class="org-arrow">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-list">
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80" alt="李总">
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">李娜</div>
+                                <div class="contact-position">副总裁</div>
+                            </div>
+                            <div class="contact-actions">
+                                <div class="contact-action call">
+                                    <i class="ri-phone-line"></i>
+                                </div>
+                                <div class="contact-action">
+                                    <i class="ri-message-2-line"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-header">
+                        <div class="org-icon" style="background-color: rgba(255, 171, 0, 0.1); color: var(--warning-color);">
+                            <i class="ri-line-chart-line"></i>
+                        </div>
+                        <div class="org-info">
+                            <div class="org-name">市场部</div>
+                            <div class="org-members">成员 <span>8</span> 人</div>
+                        </div>
+                        <div class="org-arrow">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-header">
+                        <div class="org-icon" style="background-color: rgba(157, 123, 255, 0.1); color: #9D7BFF;">
+                            <i class="ri-code-box-line"></i>
+                        </div>
+                        <div class="org-info">
+                            <div class="org-name">研发部</div>
+                            <div class="org-members">成员 <span>24</span> 人</div>
+                        </div>
+                        <div class="org-arrow">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-header">
+                        <div class="org-icon" style="background-color: rgba(255, 86, 48, 0.1); color: var(--danger-color);">
+                            <i class="ri-money-cny-box-line"></i>
+                        </div>
+                        <div class="org-info">
+                            <div class="org-name">财务部</div>
+                            <div class="org-members">成员 <span>7</span> 人</div>
+                        </div>
+                        <div class="org-arrow">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-header">
+                        <div class="org-icon" style="background-color: rgba(0, 184, 217, 0.1); color: #00B8D9;">
+                            <i class="ri-customer-service-2-line"></i>
+                        </div>
+                        <div class="org-info">
+                            <div class="org-name">客服部</div>
+                            <div class="org-members">成员 <span>15</span> 人</div>
+                        </div>
+                        <div class="org-arrow">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <i class="tab-icon ri-home-5-line"></i>
+                <span>工作台</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-task-line"></i>
+                <span>待办</span>
+            </div>
+            <div class="tab-item active">
+                <i class="tab-icon ri-contacts-book-fill"></i>
+                <span>通讯录</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-file-list-3-line"></i>
+                <span>审批</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-user-line"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple tab switching functionality
+        document.getElementById('tab-contacts').addEventListener('click', function() {
+            document.getElementById('contacts-content').style.display = 'block';
+            document.getElementById('org-structure').style.display = 'none';
+            document.querySelectorAll('.contacts-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('tab-org').addEventListener('click', function() {
+            document.getElementById('contacts-content').style.display = 'none';
+            document.getElementById('org-structure').style.display = 'block';
+            document.querySelectorAll('.contacts-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+    </script>
+</body>
+</html> 

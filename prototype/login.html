@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OA System - 登录</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <style>
+        body {
+            background-color: #F7F9FC;
+        }
+        
+        .login-container {
+            position: relative;
+            width: 390px;
+            height: 844px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 45px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-bar {
+            height: 44px;
+            width: 100%;
+            background-color: transparent;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+        
+        .login-header {
+            padding: 40px 30px 20px;
+            text-align: center;
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background-color: var(--primary-color);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-logo i {
+            font-size: 48px;
+            color: white;
+        }
+        
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        .login-form {
+            padding: 20px 30px;
+        }
+        
+        .login-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+        
+        .login-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .login-tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .login-btn {
+            margin-top: 32px;
+            width: 100%;
+            font-size: 17px;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .login-footer {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+        
+        .alt-login-methods {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .alt-login-method {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            margin: 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .alt-login-method i {
+            font-size: 24px;
+            color: var(--text-secondary);
+        }
+        
+        .fingerprint-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 0;
+        }
+        
+        .fingerprint-icon {
+            font-size: 56px;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+        
+        .fingerprint-text {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+        
+        .login-form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .login-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 111, 227, 0.1);
+        }
+        
+        .send-code-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .face-recognition {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-bar-left">9:41</div>
+            <div class="status-bar-right">
+                <span>5G</span>
+                <span style="margin-left: 5px;"><i class="ri-wifi-fill"></i></span>
+                <span style="margin-left: 5px;"><i class="ri-battery-fill battery-icon"></i></span>
+            </div>
+        </div>
+        
+        <!-- Login Header -->
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="ri-building-2-line"></i>
+            </div>
+            <h1 class="login-title">企业OA系统</h1>
+            <p class="login-subtitle">高效协作，智慧办公</p>
+        </div>
+        
+        <!-- Login Form -->
+        <div class="login-form">
+            <div class="login-tabs">
+                <div class="login-tab active" id="tab-password">账号密码</div>
+                <div class="login-tab" id="tab-sms">验证码登录</div>
+                <div class="login-tab" id="tab-biometric">生物识别</div>
+            </div>
+            
+            <!-- Password Login Form -->
+            <div class="password-login">
+                <div class="login-form-group">
+                    <input type="text" class="login-input" placeholder="请输入用户名/手机号">
+                </div>
+                <div class="login-form-group">
+                    <input type="password" class="login-input" placeholder="请输入密码">
+                </div>
+                <div class="login-options">
+                    <label><input type="checkbox"> 记住密码</label>
+                    <a href="#" style="color: var(--primary-color);">忘记密码?</a>
+                </div>
+                <button class="login-btn">登 录</button>
+            </div>
+            
+            <!-- SMS Login Form (Initially Hidden) -->
+            <div class="sms-login" style="display:none;">
+                <div class="login-form-group">
+                    <input type="text" class="login-input" placeholder="请输入手机号">
+                </div>
+                <div class="login-form-group">
+                    <input type="text" class="login-input" placeholder="请输入验证码">
+                    <button class="send-code-btn">获取验证码</button>
+                </div>
+                <button class="login-btn">登 录</button>
+            </div>
+            
+            <!-- Biometric Login (Initially Hidden) -->
+            <div class="biometric-login" style="display:none;">
+                <div class="fingerprint-container">
+                    <i class="ri-fingerprint-line fingerprint-icon"></i>
+                    <p class="fingerprint-text">点击进行指纹识别登录</p>
+                </div>
+                <div class="face-recognition">
+                    <i class="ri-face-recognition-line" style="font-size: 56px; color: var(--primary-color);"></i>
+                    <p>点击进行人脸识别登录</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Login Footer -->
+        <div class="login-footer">
+            <div class="alt-login-methods">
+                <div class="alt-login-method">
+                    <i class="ri-wechat-line" style="color: #07C160;"></i>
+                </div>
+                <div class="alt-login-method">
+                    <i class="ri-alipay-line" style="color: #1677FF;"></i>
+                </div>
+                <div class="alt-login-method">
+                    <i class="ri-dingding-line" style="color: #1E9FFF;"></i>
+                </div>
+            </div>
+            <p style="color: var(--text-tertiary); font-size: 12px;">登录即代表您同意《用户协议》和《隐私政策》</p>
+        </div>
+    </div>
+    
+    <script>
+        // Simple tab switching functionality
+        document.getElementById('tab-password').addEventListener('click', function() {
+            document.querySelector('.password-login').style.display = 'block';
+            document.querySelector('.sms-login').style.display = 'none';
+            document.querySelector('.biometric-login').style.display = 'none';
+            document.querySelectorAll('.login-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('tab-sms').addEventListener('click', function() {
+            document.querySelector('.password-login').style.display = 'none';
+            document.querySelector('.sms-login').style.display = 'block';
+            document.querySelector('.biometric-login').style.display = 'none';
+            document.querySelectorAll('.login-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        document.getElementById('tab-biometric').addEventListener('click', function() {
+            document.querySelector('.password-login').style.display = 'none';
+            document.querySelector('.sms-login').style.display = 'none';
+            document.querySelector('.biometric-login').style.display = 'block';
+            document.querySelectorAll('.login-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+    </script>
+</body>
+</html> 

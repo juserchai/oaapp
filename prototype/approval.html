@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OA System - 审批</title>
+    <link rel="stylesheet" href="css/apple-design.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <style>
+        /* Approval specific styles */
+        .approval-tabs {
+            display: flex;
+            margin: 0 20px;
+        }
+        
+        .approval-tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            position: relative;
+        }
+        
+        .approval-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .approval-tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .approval-content {
+            padding: 16px;
+            background-color: var(--background-light);
+        }
+        
+        .approval-card {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px var(--shadow-color);
+        }
+        
+        .approval-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .approval-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background-color: rgba(0, 122, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .approval-icon i {
+            font-size: 22px;
+            color: var(--primary-color);
+        }
+        
+        .approval-info {
+            flex: 1;
+        }
+        
+        .approval-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .approval-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .approval-subtitle i {
+            font-size: 14px;
+            margin-right: 4px;
+        }
+        
+        .approval-status {
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 12px;
+            flex-shrink: 0;
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-approved {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-rejected {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .approval-body {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .approval-item {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .approval-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .approval-item-label {
+            width: 80px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+        
+        .approval-item-value {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        
+        .approval-footer {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .approval-submitter {
+            display: flex;
+            align-items: center;
+        }
+        
+        .submitter-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-right: 8px;
+        }
+        
+        .submitter-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .submitter-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .approval-actions {
+            display: flex;
+        }
+        
+        .approval-btn {
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
+        .approve-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .reject-btn {
+            background-color: var(--background-white);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+        
+        .category-filter {
+            display: flex;
+            padding: 12px 16px;
+            background-color: var(--background-white);
+            overflow-x: auto;
+            white-space: nowrap;
+            margin: 0 16px 4px;
+            border-radius: var(--radius-lg);
+        }
+        
+        .filter-item {
+            padding: 6px 14px;
+            background-color: var(--background-light);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            margin-right: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .filter-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .new-approval-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            z-index: 100;
+        }
+        
+        .new-approval-btn i {
+            font-size: 24px;
+        }
+        
+        .page-header i {
+            font-size: 20px;
+        }
+        
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-full);
+            color: var(--primary-color);
+            margin-left: 8px;
+        }
+        
+        .header-action-btn:active {
+            background-color: var(--background-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-bar-left">9:41</div>
+            <div class="status-bar-right">
+                <span>5G</span>
+                <span style="margin-left: 5px;"><i class="ri-wifi-fill"></i></span>
+                <span style="margin-left: 5px;"><i class="ri-battery-fill battery-icon"></i></span>
+            </div>
+        </div>
+        
+        <!-- App Content -->
+        <div class="app-content bg-light">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-top">
+                    <h1 class="page-title fs-xxl">审批</h1>
+                    <div class="header-actions">
+                        <div class="header-action-btn">
+                            <i class="ri-search-line"></i>
+                        </div>
+                        <div class="header-action-btn">
+                            <i class="ri-filter-3-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Approval Tabs -->
+            <div class="approval-tabs">
+                <div class="approval-tab active" id="tab-to-approve">待我审批</div>
+                <div class="approval-tab" id="tab-my-approval">我的审批</div>
+                <div class="approval-tab" id="tab-cc-me">抄送我的</div>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="category-filter card">
+                <div class="filter-item active">全部</div>
+                <div class="filter-item">请假</div>
+                <div class="filter-item">报销</div>
+                <div class="filter-item">出差</div>
+                <div class="filter-item">采购</div>
+                <div class="filter-item">其他</div>
+            </div>
+            
+            <!-- Pending Approvals Section -->
+            <div id="to-approve-content" class="approval-content">
+                <div class="approval-card">
+                    <div class="approval-header">
+                        <div class="approval-icon">
+                            <i class="ri-calendar-check-line"></i>
+                        </div>
+                        <div class="approval-info">
+                            <div class="approval-title">请假申请</div>
+                            <div class="approval-subtitle">
+                                <i class="ri-time-line"></i>6月12日 10:22
+                            </div>
+                        </div>
+                        <div class="approval-status status-pending">待审批</div>
+                    </div>
+                    <div class="approval-body">
+                        <div class="approval-item">
+                            <div class="approval-item-label">请假类型</div>
+                            <div class="approval-item-value">年假</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">请假时间</div>
+                            <div class="approval-item-value">2023-06-19 至 2023-06-21</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">请假事由</div>
+                            <div class="approval-item-value">家中有事，需回老家处理</div>
+                        </div>
+                    </div>
+                    <div class="approval-footer">
+                        <div class="approval-submitter">
+                            <div class="submitter-avatar">
+                                <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=50&q=80" alt="李明">
+                            </div>
+                            <div class="submitter-info">李明 · 产品设计师</div>
+                        </div>
+                        <div class="approval-actions">
+                            <div class="approval-btn reject-btn">拒绝</div>
+                            <div class="approval-btn approve-btn">同意</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="approval-card">
+                    <div class="approval-header">
+                        <div class="approval-icon" style="background-color: rgba(255, 149, 0, 0.1); color: var(--warning-color);">
+                            <i class="ri-money-cny-circle-line"></i>
+                        </div>
+                        <div class="approval-info">
+                            <div class="approval-title">报销申请</div>
+                            <div class="approval-subtitle">
+                                <i class="ri-time-line"></i>6月11日 15:46
+                            </div>
+                        </div>
+                        <div class="approval-status status-pending">待审批</div>
+                    </div>
+                    <div class="approval-body">
+                        <div class="approval-item">
+                            <div class="approval-item-label">报销类型</div>
+                            <div class="approval-item-value">差旅费</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">报销金额</div>
+                            <div class="approval-item-value">¥2,560.00</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">报销说明</div>
+                            <div class="approval-item-value">上海客户拜访差旅费用，包含机票、酒店及餐饮</div>
+                        </div>
+                    </div>
+                    <div class="approval-footer">
+                        <div class="approval-submitter">
+                            <div class="submitter-avatar">
+                                <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=50&q=80" alt="王芳">
+                            </div>
+                            <div class="submitter-info">王芳 · 市场经理</div>
+                        </div>
+                        <div class="approval-actions">
+                            <div class="approval-btn reject-btn">拒绝</div>
+                            <div class="approval-btn approve-btn">同意</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="approval-card">
+                    <div class="approval-header">
+                        <div class="approval-icon" style="background-color: rgba(157, 123, 255, 0.1); color: #9D7BFF;">
+                            <i class="ri-shopping-cart-2-line"></i>
+                        </div>
+                        <div class="approval-info">
+                            <div class="approval-title">采购申请</div>
+                            <div class="approval-subtitle">
+                                <i class="ri-time-line"></i>6月10日 09:18
+                            </div>
+                        </div>
+                        <div class="approval-status status-pending">待审批</div>
+                    </div>
+                    <div class="approval-body">
+                        <div class="approval-item">
+                            <div class="approval-item-label">采购物品</div>
+                            <div class="approval-item-value">办公设备（电脑显示器10台）</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">申请金额</div>
+                            <div class="approval-item-value">¥12,000.00</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">采购原因</div>
+                            <div class="approval-item-value">技术部门新增人员办公设备需求</div>
+                        </div>
+                    </div>
+                    <div class="approval-footer">
+                        <div class="approval-submitter">
+                            <div class="submitter-avatar">
+                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=50&q=80" alt="陈丽">
+                            </div>
+                            <div class="submitter-info">陈丽 · 行政主管</div>
+                        </div>
+                        <div class="approval-actions">
+                            <div class="approval-btn reject-btn">拒绝</div>
+                            <div class="approval-btn approve-btn">同意</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- My Approvals Section (Initially Hidden) -->
+            <div id="my-approval-content" class="approval-content" style="display:none;">
+                <div class="approval-card">
+                    <div class="approval-header">
+                        <div class="approval-icon" style="background-color: rgba(255, 59, 48, 0.1); color: var(--danger-color);">
+                            <i class="ri-car-line"></i>
+                        </div>
+                        <div class="approval-info">
+                            <div class="approval-title">出差申请</div>
+                            <div class="approval-subtitle">
+                                <i class="ri-time-line"></i>6月8日 11:35
+                            </div>
+                        </div>
+                        <div class="approval-status status-approved">已通过</div>
+                    </div>
+                    <div class="approval-body">
+                        <div class="approval-item">
+                            <div class="approval-item-label">出差地点</div>
+                            <div class="approval-item-value">上海</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">出差时间</div>
+                            <div class="approval-item-value">2023-06-15 至 2023-06-18</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">出差事由</div>
+                            <div class="approval-item-value">参加上海国际软件展，拜访重点客户</div>
+                        </div>
+                    </div>
+                    <div class="approval-footer">
+                        <div class="approval-submitter">
+                            <div class="submitter-info">我发起的申请</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="approval-card">
+                    <div class="approval-header">
+                        <div class="approval-icon">
+                            <i class="ri-calendar-check-line"></i>
+                        </div>
+                        <div class="approval-info">
+                            <div class="approval-title">请假申请</div>
+                            <div class="approval-subtitle">
+                                <i class="ri-time-line"></i>5月22日 14:05
+                            </div>
+                        </div>
+                        <div class="approval-status status-rejected">已拒绝</div>
+                    </div>
+                    <div class="approval-body">
+                        <div class="approval-item">
+                            <div class="approval-item-label">请假类型</div>
+                            <div class="approval-item-value">事假</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">请假时间</div>
+                            <div class="approval-item-value">2023-05-25 至 2023-05-26</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">请假事由</div>
+                            <div class="approval-item-value">个人事务处理</div>
+                        </div>
+                    </div>
+                    <div class="approval-footer">
+                        <div class="approval-submitter">
+                            <div class="submitter-info">我发起的申请</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CC to Me Section (Initially Hidden) -->
+            <div id="cc-me-content" class="approval-content" style="display:none;">
+                <div class="approval-card">
+                    <div class="approval-header">
+                        <div class="approval-icon" style="background-color: rgba(0, 184, 217, 0.1); color: #00B8D9;">
+                            <i class="ri-user-add-line"></i>
+                        </div>
+                        <div class="approval-info">
+                            <div class="approval-title">招聘申请</div>
+                            <div class="approval-subtitle">
+                                <i class="ri-time-line"></i>6月7日 16:20
+                            </div>
+                        </div>
+                        <div class="approval-status status-approved">已通过</div>
+                    </div>
+                    <div class="approval-body">
+                        <div class="approval-item">
+                            <div class="approval-item-label">岗位名称</div>
+                            <div class="approval-item-value">前端开发工程师</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">需求人数</div>
+                            <div class="approval-item-value">2人</div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-item-label">岗位薪资</div>
+                            <div class="approval-item-value">15k-25k</div>
+                        </div>
+                    </div>
+                    <div class="approval-footer">
+                        <div class="approval-submitter">
+                            <div class="submitter-avatar">
+                                <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=50&q=80" alt="李娜">
+                            </div>
+                            <div class="submitter-info">李娜 · 人力资源总监</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- New Approval Button -->
+            <div class="floating-btn new-approval-btn">
+                <i class="ri-add-line"></i>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <i class="tab-icon ri-home-5-line"></i>
+                <span>工作台</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-task-line"></i>
+                <span>待办</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-calendar-line"></i>
+                <span>日程</span>
+            </div>
+            <div class="tab-item active">
+                <i class="tab-icon ri-file-list-3-fill"></i>
+                <span>审批</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-user-line"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching functionality
+        document.getElementById('tab-to-approve').addEventListener('click', function() {
+            document.querySelectorAll('.approval-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.getElementById('to-approve-content').style.display = 'block';
+            document.getElementById('my-approval-content').style.display = 'none';
+            document.getElementById('cc-me-content').style.display = 'none';
+        });
+        
+        document.getElementById('tab-my-approval').addEventListener('click', function() {
+            document.querySelectorAll('.approval-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.getElementById('to-approve-content').style.display = 'none';
+            document.getElementById('my-approval-content').style.display = 'block';
+            document.getElementById('cc-me-content').style.display = 'none';
+        });
+        
+        document.getElementById('tab-cc-me').addEventListener('click', function() {
+            document.querySelectorAll('.approval-tab').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.getElementById('to-approve-content').style.display = 'none';
+            document.getElementById('my-approval-content').style.display = 'none';
+            document.getElementById('cc-me-content').style.display = 'block';
+        });
+        
+        // Filter item toggle
+        document.querySelectorAll('.filter-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.filter-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html> 

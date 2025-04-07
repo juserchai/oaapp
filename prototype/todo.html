@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OA System - 待办事项</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <style>
+        .page-header {
+            padding: 16px 20px;
+            background-color: var(--background-white);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .todo-filter {
+            display: flex;
+            padding: 12px 16px;
+            background-color: var(--background-white);
+            overflow-x: auto;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-item {
+            padding: 8px 16px;
+            background-color: var(--background-light);
+            border-radius: 100px;
+            font-size: 14px;
+            margin-right: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .filter-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .todo-content {
+            padding: 16px;
+        }
+        
+        .todo-date {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 16px 0 12px;
+            position: sticky;
+            top: 120px;
+            background-color: var(--background-light);
+            padding: 8px 0;
+            z-index: 5;
+        }
+        
+        .todo-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid transparent;
+        }
+        
+        .todo-card.urgent {
+            border-left-color: var(--danger-color);
+        }
+        
+        .todo-card.high {
+            border-left-color: var(--warning-color);
+        }
+        
+        .todo-card.normal {
+            border-left-color: var(--primary-color);
+        }
+        
+        .todo-card.low {
+            border-left-color: var(--text-tertiary);
+        }
+        
+        .todo-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .todo-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            margin-right: 12px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .todo-checkbox.checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .todo-checkbox.checked:after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            top: 3px;
+            left: 7px;
+            transform: rotate(45deg);
+        }
+        
+        .todo-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            flex-grow: 1;
+        }
+        
+        .todo-checkbox.checked + .todo-title {
+            text-decoration: line-through;
+            color: var(--text-tertiary);
+        }
+        
+        .todo-priority {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 100px;
+            margin-left: 8px;
+        }
+        
+        .priority-urgent {
+            background-color: #FFEBE6;
+            color: var(--danger-color);
+        }
+        
+        .priority-high {
+            background-color: #FFFAE6;
+            color: var(--warning-color);
+        }
+        
+        .priority-normal {
+            background-color: #EEF2FF;
+            color: var(--primary-color);
+        }
+        
+        .priority-low {
+            background-color: #F4F5F7;
+            color: var(--text-tertiary);
+        }
+        
+        .todo-details {
+            margin-left: 34px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .todo-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-left: 34px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        
+        .todo-time {
+            display: flex;
+            align-items: center;
+        }
+        
+        .todo-time i {
+            margin-right: 4px;
+            font-size: 16px;
+        }
+        
+        .todo-category {
+            display: flex;
+            align-items: center;
+        }
+        
+        .todo-category i {
+            margin-right: 4px;
+            font-size: 16px;
+        }
+        
+        .todo-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .todo-action {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 6px;
+            color: var(--text-tertiary);
+        }
+        
+        .add-todo-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(74, 111, 227, 0.4);
+            z-index: 100;
+        }
+        
+        .add-todo-btn i {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-bar-left">9:41</div>
+            <div class="status-bar-right">
+                <span>5G</span>
+                <span style="margin-left: 5px;"><i class="ri-wifi-fill"></i></span>
+                <span style="margin-left: 5px;"><i class="ri-battery-fill battery-icon"></i></span>
+            </div>
+        </div>
+        
+        <!-- App Content -->
+        <div class="app-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">待办事项</h1>
+                <p class="page-subtitle">近期你有 8 项待办任务需要处理</p>
+            </div>
+            
+            <!-- Todo Filters -->
+            <div class="todo-filter">
+                <div class="filter-item active">全部</div>
+                <div class="filter-item">今天</div>
+                <div class="filter-item">本周</div>
+                <div class="filter-item">已完成</div>
+                <div class="filter-item">工作</div>
+                <div class="filter-item">会议</div>
+                <div class="filter-item">审批</div>
+            </div>
+            
+            <!-- Todo Content -->
+            <div class="todo-content">
+                <div class="todo-date">今天 - 6月12日 星期三</div>
+                
+                <div class="todo-card urgent">
+                    <div class="todo-header">
+                        <div class="todo-checkbox"></div>
+                        <div class="todo-title">季度财务报表审核</div>
+                        <div class="todo-priority priority-urgent">紧急</div>
+                    </div>
+                    <div class="todo-details">
+                        需要审核财务部提交的第三季度财务报表，并给出反馈意见。
+                    </div>
+                    <div class="todo-meta">
+                        <div class="todo-time">
+                            <i class="ri-time-line"></i> 14:30
+                        </div>
+                        <div class="todo-category">
+                            <i class="ri-file-list-3-line"></i> 审批
+                        </div>
+                        <div class="todo-actions">
+                            <div class="todo-action">
+                                <i class="ri-share-forward-line"></i>
+                            </div>
+                            <div class="todo-action">
+                                <i class="ri-more-2-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="todo-card high">
+                    <div class="todo-header">
+                        <div class="todo-checkbox"></div>
+                        <div class="todo-title">准备销售部门周会材料</div>
+                        <div class="todo-priority priority-high">重要</div>
+                    </div>
+                    <div class="todo-details">
+                        整理本周销售数据，准备周会汇报材料，并提前与各区域经理确认业绩情况。
+                    </div>
+                    <div class="todo-meta">
+                        <div class="todo-time">
+                            <i class="ri-time-line"></i> 16:00
+                        </div>
+                        <div class="todo-category">
+                            <i class="ri-presentation-line"></i> 工作
+                        </div>
+                        <div class="todo-actions">
+                            <div class="todo-action">
+                                <i class="ri-share-forward-line"></i>
+                            </div>
+                            <div class="todo-action">
+                                <i class="ri-more-2-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="todo-card normal">
+                    <div class="todo-header">
+                        <div class="todo-checkbox checked"></div>
+                        <div class="todo-title">回复客户邮件</div>
+                        <div class="todo-priority priority-normal">普通</div>
+                    </div>
+                    <div class="todo-details">
+                        回复昨天收到的客户关于新产品功能询问的邮件。
+                    </div>
+                    <div class="todo-meta">
+                        <div class="todo-time">
+                            <i class="ri-time-line"></i> 10:30
+                        </div>
+                        <div class="todo-category">
+                            <i class="ri-mail-line"></i> 工作
+                        </div>
+                        <div class="todo-actions">
+                            <div class="todo-action">
+                                <i class="ri-share-forward-line"></i>
+                            </div>
+                            <div class="todo-action">
+                                <i class="ri-more-2-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="todo-date">明天 - 6月13日 星期四</div>
+                
+                <div class="todo-card high">
+                    <div class="todo-header">
+                        <div class="todo-checkbox"></div>
+                        <div class="todo-title">产品设计评审会议</div>
+                        <div class="todo-priority priority-high">重要</div>
+                    </div>
+                    <div class="todo-details">
+                        参加产品部组织的新功能设计评审会议，提前阅读设计文档。
+                    </div>
+                    <div class="todo-meta">
+                        <div class="todo-time">
+                            <i class="ri-time-line"></i> 10:00
+                        </div>
+                        <div class="todo-category">
+                            <i class="ri-discuss-line"></i> 会议
+                        </div>
+                        <div class="todo-actions">
+                            <div class="todo-action">
+                                <i class="ri-share-forward-line"></i>
+                            </div>
+                            <div class="todo-action">
+                                <i class="ri-more-2-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="todo-card normal">
+                    <div class="todo-header">
+                        <div class="todo-checkbox"></div>
+                        <div class="todo-title">员工入职手续处理</div>
+                        <div class="todo-priority priority-normal">普通</div>
+                    </div>
+                    <div class="todo-details">
+                        处理新入职员工张明的入职手续，准备工作电脑和办公用品。
+                    </div>
+                    <div class="todo-meta">
+                        <div class="todo-time">
+                            <i class="ri-time-line"></i> 14:00
+                        </div>
+                        <div class="todo-category">
+                            <i class="ri-user-add-line"></i> 人事
+                        </div>
+                        <div class="todo-actions">
+                            <div class="todo-action">
+                                <i class="ri-share-forward-line"></i>
+                            </div>
+                            <div class="todo-action">
+                                <i class="ri-more-2-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="todo-card low">
+                    <div class="todo-header">
+                        <div class="todo-checkbox"></div>
+                        <div class="todo-title">更新项目进度表</div>
+                        <div class="todo-priority priority-low">次要</div>
+                    </div>
+                    <div class="todo-details">
+                        更新项目管理系统中关于UI改版项目的最新进度。
+                    </div>
+                    <div class="todo-meta">
+                        <div class="todo-time">
+                            <i class="ri-time-line"></i> 16:30
+                        </div>
+                        <div class="todo-category">
+                            <i class="ri-task-line"></i> 工作
+                        </div>
+                        <div class="todo-actions">
+                            <div class="todo-action">
+                                <i class="ri-share-forward-line"></i>
+                            </div>
+                            <div class="todo-action">
+                                <i class="ri-more-2-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Todo Button -->
+            <div class="add-todo-btn">
+                <i class="ri-add-line"></i>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <i class="tab-icon ri-home-5-line"></i>
+                <span>工作台</span>
+            </div>
+            <div class="tab-item active">
+                <i class="tab-icon ri-task-fill"></i>
+                <span>待办</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-calendar-line"></i>
+                <span>日程</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-file-list-3-line"></i>
+                <span>审批</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-user-line"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Todo checkbox toggle functionality
+        document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+        
+        // Filter item toggle
+        document.querySelectorAll('.filter-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.filter-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html> 

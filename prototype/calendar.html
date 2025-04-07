@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OA System - 日程管理</title>
+    <link rel="stylesheet" href="css/apple-design.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <style>
+        /* Calendar specific styles */
+        .view-switch {
+            margin: 0 20px;
+        }
+        
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: var(--background-white);
+        }
+        
+        .month-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .month-nav {
+            display: flex;
+            align-items: center;
+        }
+        
+        .month-btn {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            border-radius: var(--radius-full);
+        }
+        
+        .month-btn:active {
+            background-color: var(--background-secondary);
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background-color: var(--background-white);
+            padding: 10px 0;
+            text-align: center;
+        }
+        
+        .weekday {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background-color: var(--background-white);
+            padding-bottom: 10px;
+            border-bottom-left-radius: var(--radius-lg);
+            border-bottom-right-radius: var(--radius-lg);
+        }
+        
+        .day-cell {
+            height: 60px;
+            padding: 5px;
+            position: relative;
+        }
+        
+        .day-number {
+            font-size: 16px;
+            font-weight: 400;
+            text-align: center;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 4px;
+        }
+        
+        .current-day .day-number {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+        }
+        
+        .other-month {
+            opacity: 0.4;
+        }
+        
+        .day-events {
+            font-size: 9px;
+            max-height: 18px;
+            overflow: hidden;
+            padding: 0 4px;
+        }
+        
+        .day-event {
+            margin-bottom: 2px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;
+            font-size: 9px;
+        }
+        
+        .event-work {
+            background-color: var(--primary-color);
+        }
+        
+        .event-meeting {
+            background-color: var(--warning-color);
+        }
+        
+        .event-personal {
+            background-color: var(--success-color);
+        }
+        
+        .week-view,
+        .day-view {
+            display: none;
+            background-color: var(--background-white);
+            border-radius: var(--radius-lg);
+            margin: 0 16px 16px;
+            overflow: hidden;
+        }
+        
+        .month-view {
+            background-color: var(--background-white);
+            border-radius: var(--radius-lg);
+            margin: 0 16px 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        
+        .week-header {
+            display: flex;
+            box-shadow: 0 1px 0 var(--border-color);
+        }
+        
+        .time-column {
+            width: 50px;
+            flex-shrink: 0;
+            box-shadow: 1px 0 0 var(--border-color);
+        }
+        
+        .week-day-column {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+        }
+        
+        .week-day-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .week-day-number {
+            font-size: 17px;
+            font-weight: 400;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .current-week-day .week-day-number {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+        }
+        
+        .week-content {
+            display: flex;
+            position: relative;
+            height: 600px;
+            overflow-y: auto;
+        }
+        
+        .time-slots {
+            width: 50px;
+            flex-shrink: 0;
+            box-shadow: 1px 0 0 var(--border-color);
+        }
+        
+        .time-slot {
+            height: 60px;
+            padding: 2px 8px;
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            box-shadow: 0 1px 0 var(--border-color);
+        }
+        
+        .days-grid {
+            display: flex;
+            flex: 1;
+        }
+        
+        .day-column {
+            flex: 1;
+            position: relative;
+            box-shadow: 1px 0 0 var(--border-color);
+        }
+        
+        .day-column:last-child {
+            box-shadow: none;
+        }
+        
+        .hour-row {
+            height: 60px;
+            box-shadow: 0 1px 0 var(--border-color);
+        }
+        
+        .week-event {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            padding: 4px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            color: white;
+            overflow: hidden;
+            z-index: 5;
+        }
+        
+        .day-header {
+            padding: 16px 20px;
+            text-align: center;
+            box-shadow: 0 1px 0 var(--border-color);
+        }
+        
+        .day-date {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .day-weekday {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .day-timeline {
+            display: flex;
+        }
+        
+        .day-time-column {
+            width: 50px;
+            flex-shrink: 0;
+            box-shadow: 1px 0 0 var(--border-color);
+        }
+        
+        .day-content-column {
+            flex: 1;
+            position: relative;
+        }
+        
+        .day-time-slot {
+            height: 60px;
+            padding: 2px 8px;
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            box-shadow: 0 1px 0 var(--border-color);
+        }
+        
+        .day-hour-row {
+            height: 60px;
+            box-shadow: 0 1px 0 var(--border-color);
+        }
+        
+        .day-event {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            color: white;
+            overflow: hidden;
+            z-index: 5;
+        }
+        
+        .day-event-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .day-event-time {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .add-event-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            z-index: 100;
+        }
+        
+        .add-event-btn i {
+            font-size: 24px;
+        }
+        
+        .page-header i {
+            font-size: 20px;
+        }
+        
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-full);
+            color: var(--primary-color);
+            margin-left: 8px;
+        }
+        
+        .header-action-btn:active {
+            background-color: var(--background-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-bar-left">9:41</div>
+            <div class="status-bar-right">
+                <span>5G</span>
+                <span style="margin-left: 5px;"><i class="ri-wifi-fill"></i></span>
+                <span style="margin-left: 5px;"><i class="ri-battery-fill battery-icon"></i></span>
+            </div>
+        </div>
+        
+        <!-- App Content -->
+        <div class="app-content bg-light">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-top">
+                    <h1 class="page-title fs-xxl">日程</h1>
+                    <div class="header-actions">
+                        <div class="header-action-btn">
+                            <i class="ri-search-line"></i>
+                        </div>
+                        <div class="header-action-btn">
+                            <i class="ri-more-2-fill"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="segment-control view-switch">
+                    <div class="segment-item" id="day-view-btn">日</div>
+                    <div class="segment-item active" id="week-view-btn">周</div>
+                    <div class="segment-item" id="month-view-btn">月</div>
+                </div>
+            </div>
+            
+            <!-- Month View -->
+            <div class="month-view" id="month-view">
+                <div class="month-header">
+                    <div class="month-title">2023年6月</div>
+                    <div class="month-nav">
+                        <div class="month-btn">
+                            <i class="ri-arrow-left-s-line"></i>
+                        </div>
+                        <div class="month-btn">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="weekdays">
+                    <div class="weekday">周日</div>
+                    <div class="weekday">周一</div>
+                    <div class="weekday">周二</div>
+                    <div class="weekday">周三</div>
+                    <div class="weekday">周四</div>
+                    <div class="weekday">周五</div>
+                    <div class="weekday">周六</div>
+                </div>
+                
+                <div class="calendar-grid">
+                    <!-- Previous Month Days -->
+                    <div class="day-cell other-month">
+                        <div class="day-number">28</div>
+                    </div>
+                    <div class="day-cell other-month">
+                        <div class="day-number">29</div>
+                    </div>
+                    <div class="day-cell other-month">
+                        <div class="day-number">30</div>
+                    </div>
+                    <div class="day-cell other-month">
+                        <div class="day-number">31</div>
+                    </div>
+                    
+                    <!-- Current Month Days -->
+                    <div class="day-cell">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">5</div>
+                        <div class="day-events">
+                            <div class="day-event event-work">产品讨论</div>
+                        </div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">6</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">7</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">8</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">9</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">10</div>
+                        <div class="day-events">
+                            <div class="day-event event-meeting">部门例会</div>
+                        </div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">11</div>
+                    </div>
+                    <div class="day-cell current-day">
+                        <div class="day-number">12</div>
+                        <div class="day-events">
+                            <div class="day-event event-personal">午餐会议</div>
+                            <div class="day-event event-work">财务审核</div>
+                        </div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">13</div>
+                        <div class="day-events">
+                            <div class="day-event event-meeting">设计评审</div>
+                        </div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">14</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">15</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">16</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">17</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">18</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">19</div>
+                        <div class="day-events">
+                            <div class="day-event event-meeting">员工培训</div>
+                        </div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">20</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">21</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">22</div>
+                        <div class="day-events">
+                            <div class="day-event event-personal">客户拜访</div>
+                        </div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">23</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">24</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">25</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">26</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">27</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">28</div>
+                        <div class="day-events">
+                            <div class="day-event event-work">季度汇报</div>
+                        </div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">29</div>
+                    </div>
+                    <div class="day-cell">
+                        <div class="day-number">30</div>
+                    </div>
+                    
+                    <!-- Next Month Days -->
+                    <div class="day-cell other-month">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="day-cell other-month">
+                        <div class="day-number">2</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Week View -->
+            <div class="week-view card" id="week-view">
+                <div class="week-header">
+                    <div class="time-column"></div>
+                    <div class="week-day-column">
+                        <div class="week-day-name">周一</div>
+                        <div class="week-day-number">10</div>
+                    </div>
+                    <div class="week-day-column">
+                        <div class="week-day-name">周二</div>
+                        <div class="week-day-number">11</div>
+                    </div>
+                    <div class="week-day-column current-week-day">
+                        <div class="week-day-name">周三</div>
+                        <div class="week-day-number">12</div>
+                    </div>
+                    <div class="week-day-column">
+                        <div class="week-day-name">周四</div>
+                        <div class="week-day-number">13</div>
+                    </div>
+                    <div class="week-day-column">
+                        <div class="week-day-name">周五</div>
+                        <div class="week-day-number">14</div>
+                    </div>
+                </div>
+                
+                <div class="week-content">
+                    <div class="time-slots">
+                        <div class="time-slot">9:00</div>
+                        <div class="time-slot">10:00</div>
+                        <div class="time-slot">11:00</div>
+                        <div class="time-slot">12:00</div>
+                        <div class="time-slot">13:00</div>
+                        <div class="time-slot">14:00</div>
+                        <div class="time-slot">15:00</div>
+                        <div class="time-slot">16:00</div>
+                        <div class="time-slot">17:00</div>
+                        <div class="time-slot">18:00</div>
+                    </div>
+                    
+                    <div class="days-grid">
+                        <div class="day-column">
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            
+                            <div class="week-event event-meeting" style="top: 120px; height: 90px;">
+                                部门例会
+                            </div>
+                        </div>
+                        
+                        <div class="day-column">
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                        </div>
+                        
+                        <div class="day-column">
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            
+                            <div class="week-event event-personal" style="top: 180px; height: 60px;">
+                                午餐会议
+                            </div>
+                            
+                            <div class="week-event event-work" style="top: 300px; height: 120px;">
+                                季度财务报表审核
+                            </div>
+                        </div>
+                        
+                        <div class="day-column">
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            
+                            <div class="week-event event-meeting" style="top: 60px; height: 90px;">
+                                产品设计评审会议
+                            </div>
+                        </div>
+                        
+                        <div class="day-column">
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                            <div class="hour-row"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Day View -->
+            <div class="day-view card" id="day-view">
+                <div class="day-header">
+                    <div class="day-date">2023年6月12日</div>
+                    <div class="day-weekday">星期三</div>
+                </div>
+                
+                <div class="day-timeline">
+                    <div class="day-time-column">
+                        <div class="day-time-slot">9:00</div>
+                        <div class="day-time-slot">10:00</div>
+                        <div class="day-time-slot">11:00</div>
+                        <div class="day-time-slot">12:00</div>
+                        <div class="day-time-slot">13:00</div>
+                        <div class="day-time-slot">14:00</div>
+                        <div class="day-time-slot">15:00</div>
+                        <div class="day-time-slot">16:00</div>
+                        <div class="day-time-slot">17:00</div>
+                        <div class="day-time-slot">18:00</div>
+                    </div>
+                    
+                    <div class="day-content-column">
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        <div class="day-hour-row"></div>
+                        
+                        <div class="day-event event-personal" style="top: 180px; height: 60px;">
+                            <div class="day-event-title">午餐会议</div>
+                            <div class="day-event-time">12:00 - 13:00</div>
+                        </div>
+                        
+                        <div class="day-event event-work" style="top: 300px; height: 120px;">
+                            <div class="day-event-title">季度财务报表审核</div>
+                            <div class="day-event-time">14:00 - 16:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Event Button -->
+            <div class="floating-btn add-event-btn">
+                <i class="ri-add-line"></i>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <i class="tab-icon ri-home-5-line"></i>
+                <span>工作台</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-task-line"></i>
+                <span>待办</span>
+            </div>
+            <div class="tab-item active">
+                <i class="tab-icon ri-calendar-fill"></i>
+                <span>日程</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-file-list-3-line"></i>
+                <span>审批</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-user-line"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // View switching functionality
+        document.getElementById('day-view-btn').addEventListener('click', function() {
+            document.querySelectorAll('.segment-item').forEach(option => option.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.getElementById('day-view').style.display = 'block';
+            document.getElementById('week-view').style.display = 'none';
+            document.getElementById('month-view').style.display = 'none';
+        });
+        
+        document.getElementById('week-view-btn').addEventListener('click', function() {
+            document.querySelectorAll('.segment-item').forEach(option => option.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.getElementById('day-view').style.display = 'none';
+            document.getElementById('week-view').style.display = 'block';
+            document.getElementById('month-view').style.display = 'none';
+        });
+        
+        document.getElementById('month-view-btn').addEventListener('click', function() {
+            document.querySelectorAll('.segment-item').forEach(option => option.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.getElementById('day-view').style.display = 'none';
+            document.getElementById('week-view').style.display = 'none';
+            document.getElementById('month-view').style.display = 'block';
+        });
+        
+        // Initialize the default view (week)
+        document.getElementById('week-view').style.display = 'block';
+    </script>
+</body>
+</html>

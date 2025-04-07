@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的 - OA办公系统</title>
+    <link rel="stylesheet" href="css/apple-design.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <style>
+        .app-container {
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            padding-bottom: 20px;
+        }
+        
+        .profile-header {
+            padding: 24px 16px;
+            display: flex;
+            align-items: center;
+            background-color: var(--surface-background);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 600;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        
+        .profile-info {
+            flex: 1;
+            min-width: 0; /* Prevent content from overflowing flex container */
+        }
+        
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .profile-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .profile-department {
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .profile-edit {
+            color: var(--primary-color);
+            font-size: 18px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+        
+        .menu-group {
+            background-color: var(--surface-background);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .menu-group-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 16px 16px 8px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            text-decoration: none;
+            color: inherit;
+            transition: background-color 0.2s;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:active {
+            background-color: var(--hover-background);
+        }
+        
+        .menu-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background-color: rgba(0, 122, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .menu-icon i {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        
+        .menu-title {
+            flex: 1;
+            font-size: 15px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .menu-detail {
+            color: var(--text-tertiary);
+            font-size: 14px;
+            padding-right: 8px;
+            flex-shrink: 0;
+        }
+        
+        .menu-arrow {
+            color: var(--text-tertiary);
+            font-size: 18px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logout-button {
+            display: block;
+            background-color: var(--surface-background);
+            color: var(--error-color);
+            text-align: center;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        
+        .logout-button:active {
+            background-color: var(--hover-background);
+            transform: scale(0.98);
+        }
+        
+        .version-info {
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        
+        /* Touch feedback for menu items */
+        .item-active {
+            background-color: var(--hover-background);
+        }
+        
+        /* Media queries for different screen sizes */
+        @media (max-width: 375px) {
+            .profile-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+            
+            .profile-name {
+                font-size: 18px;
+            }
+            
+            .profile-title, .profile-department {
+                font-size: 12px;
+            }
+            
+            .menu-item {
+                padding: 14px 16px;
+            }
+        }
+        
+        @media (min-width: 540px) {
+            .app-container {
+                padding: 24px;
+                padding-bottom: 24px;
+                border-left: 1px solid var(--border-color);
+                border-right: 1px solid var(--border-color);
+            }
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-button {
+            color: var(--primary-color);
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        
+        .page-title {
+            flex: 1;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 页面头部 -->
+        <header class="page-header">
+            <a href="index.html" class="back-button" aria-label="返回首页">
+                <i class="ri-arrow-left-s-line"></i>
+            </a>
+            <h1 class="page-title">我的</h1>
+        </header>
+        
+        <!-- 个人资料头部 -->
+        <div class="profile-header">
+            <div class="profile-avatar">张</div>
+            <div class="profile-info">
+                <div class="profile-name">张明</div>
+                <div class="profile-title">产品经理</div>
+                <div class="profile-department">研发中心 - 产品部</div>
+            </div>
+            <a href="#" class="profile-edit" aria-label="编辑个人信息">
+                <i class="ri-edit-line"></i>
+            </a>
+        </div>
+        
+        <!-- 工作信息 -->
+        <div class="menu-group">
+            <div class="menu-group-title">工作信息</div>
+            
+            <a href="#" class="menu-item">
+                <div class="menu-icon" style="background-color: rgba(52, 199, 89, 0.1);">
+                    <i class="ri-user-settings-line" style="color: var(--success-color);"></i>
+                </div>
+                <div class="menu-title">我的信息</div>
+                <div class="menu-arrow">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <div class="menu-icon" style="background-color: rgba(255, 149, 0, 0.1);">
+                    <i class="ri-time-line" style="color: var(--warning-color);"></i>
+                </div>
+                <div class="menu-title">考勤记录</div>
+                <div class="menu-arrow">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <div class="menu-icon" style="background-color: rgba(90, 200, 250, 0.1);">
+                    <i class="ri-file-list-3-line" style="color: rgb(90, 200, 250);"></i>
+                </div>
+                <div class="menu-title">我的绩效</div>
+                <div class="menu-arrow">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </a>
+        </div>
+        
+        <!-- 应用设置 -->
+        <div class="menu-group">
+            <div class="menu-group-title">应用设置</div>
+            
+            <a href="#" class="menu-item">
+                <div class="menu-icon" style="background-color: rgba(88, 86, 214, 0.1);">
+                    <i class="ri-notification-4-line" style="color: rgb(88, 86, 214);"></i>
+                </div>
+                <div class="menu-title">通知设置</div>
+                <div class="menu-arrow">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <div class="menu-icon" style="background-color: rgba(255, 45, 85, 0.1);">
+                    <i class="ri-lock-line" style="color: var(--error-color);"></i>
+                </div>
+                <div class="menu-title">隐私与安全</div>
+                <div class="menu-arrow">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <div class="menu-icon">
+                    <i class="ri-palette-line"></i>
+                </div>
+                <div class="menu-title">显示与外观</div>
+                <div class="menu-detail">默认</div>
+                <div class="menu-arrow">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <div class="menu-icon">
+                    <i class="ri-information-line"></i>
+                </div>
+                <div class="menu-title">关于</div>
+                <div class="menu-arrow">
+                    <i class="ri-arrow-right-s-line"></i>
+                </div>
+            </a>
+        </div>
+        
+        <!-- 退出按钮 -->
+        <a href="#" class="logout-button">退出登录</a>
+        
+        <!-- 版本信息 -->
+        <div class="version-info">OA办公系统 v1.0.0</div>
+    </div>
+    
+    <script>
+        // Menu item interaction
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.add('item-active');
+                setTimeout(() => {
+                    this.classList.remove('item-active');
+                }, 150);
+            });
+        });
+        
+        // Logout button interaction
+        document.querySelector('.logout-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('确定要退出登录吗？')) {
+                // Handle logout logic here
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html> 

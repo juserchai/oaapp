@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OA System - 工作台</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        .app-header {
+            background-color: var(--primary-color);
+            padding: 20px 20px 24px;
+            color: white;
+            position: relative;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-welcome {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .header-actions {
+            display: flex;
+        }
+        
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            color: white;
+        }
+        
+        .header-action-btn i {
+            font-size: 20px;
+        }
+        
+        .search-bar {
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .search-input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 15px;
+            width: 100%;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .search-input:focus {
+            outline: none;
+        }
+        
+        .stats-cards {
+            display: flex;
+            padding: 0 16px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 0 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .section {
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .section-more {
+            color: var(--text-secondary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-more i {
+            font-size: 16px;
+            margin-left: 4px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .quick-action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        
+        .quick-action-icon.blue {
+            background-color: #EBF2FF;
+            color: var(--primary-color);
+        }
+        
+        .quick-action-icon.green {
+            background-color: #E3FCEF;
+            color: var(--success-color);
+        }
+        
+        .quick-action-icon.orange {
+            background-color: #FFF8E6;
+            color: var(--warning-color);
+        }
+        
+        .quick-action-icon.purple {
+            background-color: #F3EBFF;
+            color: #9D7BFF;
+        }
+        
+        .quick-action-icon i {
+            font-size: 24px;
+        }
+        
+        .quick-action-text {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 8px;
+        }
+        
+        .task-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .task-date {
+            color: var(--text-secondary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .task-date i {
+            font-size: 16px;
+            margin-right: 4px;
+        }
+        
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .task-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .task-status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .status-urgent {
+            background-color: var(--danger-color);
+        }
+        
+        .status-normal {
+            background-color: var(--primary-color);
+        }
+        
+        .status-low {
+            background-color: var(--text-tertiary);
+        }
+        
+        .task-status-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .task-assignee {
+            display: flex;
+            align-items: center;
+        }
+        
+        .assignee-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #ddd;
+            overflow: hidden;
+            margin-right: 8px;
+        }
+        
+        .assignee-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .assignee-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .announcement-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .announcement-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .announcement-date {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        
+        .announcement-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .announcement-footer {
+            display: flex;
+            align-items: center;
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+        
+        .announcement-footer i {
+            margin-right: 4px;
+        }
+        
+        .announcement-footer span {
+            margin-right: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-bar-left">9:41</div>
+            <div class="status-bar-right">
+                <span>5G</span>
+                <span style="margin-left: 5px;"><i class="ri-wifi-fill"></i></span>
+                <span style="margin-left: 5px;"><i class="ri-battery-fill battery-icon"></i></span>
+            </div>
+        </div>
+        
+        <!-- App Content -->
+        <div class="app-content">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="header-top">
+                    <div class="user-welcome">早上好，王经理</div>
+                    <div class="header-actions">
+                        <div class="header-action-btn">
+                            <i class="ri-notification-3-line"></i>
+                        </div>
+                        <div class="header-action-btn">
+                            <i class="ri-user-line"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-bar">
+                    <i class="ri-search-line"></i>
+                    <input type="text" class="search-input" placeholder="搜索应用、文档、联系人...">
+                </div>
+            </div>
+            
+            <!-- Stat Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">待办任务</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">待审批</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">今日日程</div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">常用功能</h2>
+                </div>
+                <div class="quick-actions">
+                    <div class="quick-action">
+                        <div class="quick-action-icon blue">
+                            <i class="ri-file-list-3-line"></i>
+                        </div>
+                        <div class="quick-action-text">请假申请</div>
+                    </div>
+                    <div class="quick-action">
+                        <div class="quick-action-icon green">
+                            <i class="ri-money-cny-circle-line"></i>
+                        </div>
+                        <div class="quick-action-text">报销</div>
+                    </div>
+                    <div class="quick-action">
+                        <div class="quick-action-icon orange">
+                            <i class="ri-calendar-check-line"></i>
+                        </div>
+                        <div class="quick-action-text">外出申请</div>
+                    </div>
+                    <div class="quick-action">
+                        <div class="quick-action-icon purple">
+                            <i class="ri-user-star-line"></i>
+                        </div>
+                        <div class="quick-action-text">招聘申请</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Visualization -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">本月工作统计</h2>
+                    <div class="section-more">
+                        更多数据<i class="ri-arrow-right-s-line"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div id="workChart" class="chart-container"></div>
+                </div>
+            </div>
+            
+            <!-- Tasks -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">待办任务</h2>
+                    <div class="section-more">
+                        查看全部<i class="ri-arrow-right-s-line"></i>
+                    </div>
+                </div>
+                
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-title">季度财务报表审核</div>
+                        <div class="task-date">
+                            <i class="ri-time-line"></i>今天 14:30
+                        </div>
+                    </div>
+                    <div class="task-content">
+                        需要审核财务部提交的第三季度财务报表，并给出反馈意见。
+                    </div>
+                    <div class="task-footer">
+                        <div class="task-status">
+                            <div class="task-status-indicator status-urgent"></div>
+                            <div class="task-status-text">紧急</div>
+                        </div>
+                        <div class="task-assignee">
+                            <div class="assignee-avatar">
+                                <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=50&q=80" alt="张丽">
+                            </div>
+                            <div class="assignee-name">来自：张丽</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="task-card">
+                    <div class="task-header">
+                        <div class="task-title">产品设计评审</div>
+                        <div class="task-date">
+                            <i class="ri-time-line"></i>明天 10:00
+                        </div>
+                    </div>
+                    <div class="task-content">
+                        参与新产品功能的设计评审会议，确定最终设计方案。
+                    </div>
+                    <div class="task-footer">
+                        <div class="task-status">
+                            <div class="task-status-indicator status-normal"></div>
+                            <div class="task-status-text">普通</div>
+                        </div>
+                        <div class="task-assignee">
+                            <div class="assignee-avatar">
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=50&q=80" alt="李明">
+                            </div>
+                            <div class="assignee-name">来自：李明</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Announcements -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">公司公告</h2>
+                    <div class="section-more">
+                        查看全部<i class="ri-arrow-right-s-line"></i>
+                    </div>
+                </div>
+                
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <div class="announcement-title">关于年终奖金发放通知</div>
+                        <div class="announcement-date">6月8日</div>
+                    </div>
+                    <div class="announcement-content">
+                        根据公司年度业绩考核结果，2023年度年终奖将于12月25日发放，请各部门做好统计工作...
+                    </div>
+                    <div class="announcement-footer">
+                        <span><i class="ri-eye-line"></i>328</span>
+                        <span><i class="ri-thumb-up-line"></i>56</span>
+                        <span><i class="ri-chat-1-line"></i>12</span>
+                    </div>
+                </div>
+                
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <div class="announcement-title">第三季度员工表彰大会</div>
+                        <div class="announcement-date">6月5日</div>
+                    </div>
+                    <div class="announcement-content">
+                        第三季度员工表彰大会将于本周五下午3点在多功能厅举行，请各部门提前安排人员参加...
+                    </div>
+                    <div class="announcement-footer">
+                        <span><i class="ri-eye-line"></i>256</span>
+                        <span><i class="ri-thumb-up-line"></i>42</span>
+                        <span><i class="ri-chat-1-line"></i>8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item active">
+                <i class="tab-icon ri-home-5-fill"></i>
+                <span>工作台</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-task-line"></i>
+                <span>待办</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-calendar-line"></i>
+                <span>日程</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-file-list-3-line"></i>
+                <span>审批</span>
+            </div>
+            <div class="tab-item">
+                <i class="tab-icon ri-user-line"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            var workChart = echarts.init(document.getElementById('workChart'));
+            
+            var option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['第1周', '第2周', '第3周', '第4周']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '完成任务',
+                        type: 'bar',
+                        data: [13, 17, 15, 9],
+                        itemStyle: {
+                            color: '#4A6FE3'
+                        }
+                    },
+                    {
+                        name: '新增任务',
+                        type: 'line',
+                        data: [15, 19, 13, 12],
+                        itemStyle: {
+                            color: '#36B37E'
+                        }
+                    }
+                ]
+            };
+            
+            workChart.setOption(option);
+            
+            // Responsive chart
+            window.addEventListener('resize', function() {
+                workChart.resize();
+            });
+        });
+    </script>
+</body>
+</html> 
