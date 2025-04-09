@@ -1,0 +1,59 @@
+spring:
+  # 数据库配置
+  datasource:
+    url: jdbc:h2:mem:oa_system;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # H2 Console
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+  
+  # 为了在Spring Boot 2.5+中启用自动SQL初始化
+  sql:
+    init:
+      mode: embedded
+      continue-on-error: true
+  
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    serialization:
+      write-dates-as-timestamps: false
+
+# 应用配置
+server:
+  port: 3001
+  servlet:
+    context-path: /api
+
+# JWT配置
+jwt:
+  secret: 'your_jwt_secret_key_change_in_production_a_min_256_bit_key_required'
+  expiration-ms: 86400000  # 24小时
+
+# OpenAPI/Swagger配置
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger
+    tags-sorter: alpha
+    operations-sorter: alpha 

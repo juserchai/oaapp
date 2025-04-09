@@ -1,0 +1,86 @@
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### Spring Boot ###
+**/application-dev.properties
+**/application-prod.properties
+**/application-test.properties
+**/application-local.properties
+**/src/main/**/application-*.yml
+**/src/main/**/application-*.yaml
+**/src/test/**/application-*.yml
+**/src/test/**/application-*.yaml
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+.code-workspace
+
+### H2 Database ###
+*.db
+*.mv.db
+*.trace.db
+
+### Logs ###
+*.log
+log/
+logs/
+
+### OS files ###
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### Application specific ###
+application-secrets.properties
+application-secrets.yml
+**/resources/secrets/
+**/src/main/resources/static/generated/ 
