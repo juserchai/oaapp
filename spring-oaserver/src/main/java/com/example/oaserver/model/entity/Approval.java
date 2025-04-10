@@ -43,11 +43,13 @@ public class Approval {
     @Builder.Default
     private ApprovalStatus status = ApprovalStatus.PENDING;
 
-    @Column
-    private String requesterId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requester_id")
+    private User submitter;
 
-    @Column
-    private String approverId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approver_id")
+    private User approver;
 
     @Column
     private String rejectionReason;

@@ -1,9 +1,9 @@
 package com.example.oaserver.model.enums;
 
 /**
- * 待办事项优先级枚举
+ * 优先级枚举
  */
-public enum TodoPriority {
+public enum Priority {
     HIGH,
     MEDIUM,
     LOW

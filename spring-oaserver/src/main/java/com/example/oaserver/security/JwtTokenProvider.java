@@ -55,6 +55,20 @@ public class JwtTokenProvider {
                 .signWith(key)
                 .compact();
     }
+    
+    /**
+     * 基于用户名生成token（用于测试）
+     * @param username 用户名
+     * @return JWT令牌
+     */
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(key)
+                .compact();
+    }
 
     public String getUsernameFromJwtToken(String token) {
         Claims claims = Jwts.parserBuilder()

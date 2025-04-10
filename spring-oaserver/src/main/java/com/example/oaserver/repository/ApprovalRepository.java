@@ -15,22 +15,20 @@ import java.util.Optional;
 public interface ApprovalRepository extends JpaRepository<Approval, String> {
     
     // 查找待用户审批的申请
-    @Query("SELECT a FROM Approval a WHERE a.approverId = ?1 AND a.status = ?2 ORDER BY a.createdAt DESC")
-    List<Approval> findByApproverAndStatusOrderByCreatedAtDesc(User approver, ApprovalStatus status);
+    @Query("SELECT a FROM Approval a WHERE a.approver.id = ?1 AND a.status = ?2 ORDER BY a.createdAt DESC")
+    List<Approval> findByApproverIdAndStatusOrderByCreatedAtDesc(String approverId, ApprovalStatus status);
     
-    // 新增方法
-    @Query("SELECT a FROM Approval a WHERE a.requesterId = ?1 ORDER BY a.createdAt DESC")
-    List<Approval> findAllByRequesterId(String requesterId);
+    // 查找用户提交的申请
+    @Query("SELECT a FROM Approval a WHERE a.submitter.id = ?1 ORDER BY a.createdAt DESC")
+    List<Approval> findBySubmitterIdOrderByCreatedAtDesc(String submitterId);
     
-    @Query("SELECT a FROM Approval a WHERE a.approverId = ?1 ORDER BY a.createdAt DESC")
-    List<Approval> findAllByApproverId(String approverId);
-    
-    @Query("SELECT a FROM Approval a WHERE a.id = ?1 AND a.approverId = ?2")
-    Optional<Approval> findByIdAndApproverId(String id, String approverId);
+    // 查找用户提交的指定类型的申请
+    @Query("SELECT a FROM Approval a WHERE a.submitter.id = ?1 AND a.type = ?2 ORDER BY a.createdAt DESC")
+    List<Approval> findBySubmitterIdAndTypeOrderByCreatedAtDesc(String submitterId, ApprovalType type);
     
     // 查找抄送给用户的审批
     @Query("SELECT a FROM Approval a WHERE ?1 MEMBER OF a.ccTo ORDER BY a.createdAt DESC")
-    List<Approval> findCcToUser(User user);
+    List<Approval> findCcToUser(String userId);
     
     // 查找指定类型和状态的审批
     @Query("SELECT a FROM Approval a WHERE a.type = ?1 AND a.status = ?2 ORDER BY a.createdAt DESC")
